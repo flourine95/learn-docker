@@ -1,3 +1,8 @@
-FROM tomcat:10-jdk17-corretto
+FROM maven:3.9-eclipse-temurin-17 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn clean package
 
-COPY ./target/demo-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+# Stage 2: Deploy to Tomcat
+FROM tomcat:10-jdk17-corretto
+COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
